@@ -1,0 +1,19 @@
+	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+	PREFIX owl: <http://www.w3.org/2002/07/owl#>
+	PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+	PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+	PREFIX nen2660: <https://w3id.org/nen2660/def#>
+	########################
+	# OUTPUT: Alle kenmerken van een geselecteerd object (zowel direct als overgeÃ«rfd van supertypes).
+	#
+	# INPUT: ?conceptUri
+	########################
+	
+	SELECT DISTINCT ?conceptUri ?conceptName ?conceptAltName
+	WHERE {
+		# Find all specializations of FysiekObject and Assetcluster, and all aspects that are linked to these concepts
+		?conceptUri rdfs:subClassOf+ nen2660:RealObject .
+		?conceptUri skos:prefLabel ?conceptName . 
+		OPTIONAL { ?conceptUri skos:altLabel ?conceptAltName } 
+	}

@@ -1,0 +1,9 @@
+streamlit
+rdflib
+pyshacl
+requests
+pandas
+pydeck
+pyyaml
+xlsxwriter
+openpyxl
