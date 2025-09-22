@@ -1,0 +1,6 @@
+requests
+rdflib
+pandas
+xlsxwriter
+pyyaml
+click

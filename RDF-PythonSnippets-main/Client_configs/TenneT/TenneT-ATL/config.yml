@@ -1,0 +1,27 @@
+queries:
+  General Info:
+    file: "./EU-303ATL - General Info.sparql"
+    columns:
+      - activityUri
+  Taxonomy:
+    file: "./EU-303ATL - Taxonomy.sparql"
+    columns:
+      - activityUri
+  Decomposition:
+    file: "./EU-303ATL - Decomposition.sparql"
+    columns:
+      - activityUri
+endpoints:
+  old: 
+    url: https://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-atl/versions/v7_0/sparql?default-graph-uri=https://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-dcc/versions/v6_1
+    username: 9d8f4122-7435-464f-8be5-8ad1631dc5de
+    password: CgYucApC4CUEzkoHA9iP
+    default-graph-uri: []
+    named-graph-uri: []
+  new:
+    url:  https://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-atl/versions/concept/sparql?default-graph-uri=https://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-dcc/versions/v6_1
+    username: 9d8f4122-7435-464f-8be5-8ad1631dc5de
+    password: CgYucApC4CUEzkoHA9iP
+    default-graph-uri: []
+    named-graph-uri: []    
+output_path: ATL v7.0 to v7.1 changelog.xlsx

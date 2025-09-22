@@ -1,0 +1,8 @@
+**/private_test/**
+**/__pycache__/**
+*/dist/*
+UNKNOWN.egg-info/*
+*/build/*
+*.egg-info
+amsterdam-otl-changelog-main/**
+

@@ -1,0 +1,20 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX tennet: <http://data.tennet.eu/def/>
+PREFIX nen2660: <https://w3id.org/nen2660/def#>
+
+SELECT ?specUri ?specCode ?groupName ?value
+WHERE {
+    ?specUri rdf:type ?conceptualSpecUri .
+    ?specUri skos:notation ?specCode .
+    ?conceptualSpecUri rdfs:subClassOf nen2660:Requirement .
+    ?specUri <http://data.tennet.eu/def/c57dda062eb8c5563086d4fabbe27288> ?value . #Conductor clamp type
+    <http://data.tennet.eu/def/c57dda062eb8c5563086d4fabbe27288> skos:prefLabel ?groupName .
+    <http://data.tennet.eu/def/c57dda062eb8c5563086d4fabbe27288> skos:note "Configurator" .
+}
+ORDER BY ?specCode ?groupName ?value

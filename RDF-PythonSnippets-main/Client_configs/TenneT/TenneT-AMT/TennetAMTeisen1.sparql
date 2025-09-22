@@ -1,0 +1,67 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX tennet: <http://data.tennet.eu/def/>
+PREFIX nen2660: <https://w3id.org/nen2660/def#>
+
+SELECT ?specUri ?specCode ?specName ?specText ?specPlusAspectLabel ?docCodeSource ?docNameSource ?bovenliggendeSpecUri ?OGGofKlanteis ?sourceDocument ?conceptualSpecName ?specLabel ?aspectLabel ?sharepointURL ?owner ?vakgebied ?rfcURL
+WHERE {
+  ?specUri rdf:type ?conceptualSpecUri .
+  ?specUri skos:prefLabel ?specName .
+  ?specUri skos:notation ?specCode .
+  ?specUri rdf:value ?specText .
+  ?conceptualSpecUri skos:prefLabel ?conceptualSpecName .
+  ?conceptualSpecUri rdfs:subClassOf nen2660:Requirement .
+  OPTIONAL {
+    ?specUri ?specLabelProp ?specLabel .
+    ?specLabelProp a owl:AnnotationProperty .
+    ?specLabelProp skos:prefLabel "Specification label" .
+  }
+  OPTIONAL {
+    ?specUri ?aspectLabelProp ?aspectLabel .
+    ?aspectLabelProp a owl:AnnotationProperty .
+    ?aspectLabelProp skos:prefLabel "Aspect label" .
+  }
+  OPTIONAL {
+    ?specUri ?sourceDocumentProp ?sourceDocument .
+    ?sourceDocumentProp a owl:AnnotationProperty .
+    ?sourceDocumentProp skos:prefLabel "Source document" .
+  }
+  OPTIONAL {
+    ?bovenliggendeSpecUri tennet:isDerivedIn ?specUri .
+    ?bovenliggendeSpecUri skos:notation ?bovenliggendeSpecCode .
+  }
+  OPTIONAL {
+    ?specUri ?oggKlantProp ?OGGofKlanteis .
+    ?oggKlantProp a owl:AnnotationProperty .
+    ?oggKlantProp skos:prefLabel "OGG-/Klant-eis" .
+  }
+  OPTIONAL {
+    ?specUri ?sharepointURLProp ?sharepointURL .
+    ?sharepointURLProp a owl:AnnotationProperty .
+    ?sharepointURLProp skos:prefLabel "File URL" .
+  }
+  OPTIONAL {
+    ?specUri ?ownerProp ?owner .
+    ?ownerProp a owl:AnnotationProperty .
+    ?ownerProp skos:prefLabel "Owner" .
+  }
+  OPTIONAL {
+    ?specUri ?vakgebiedProp ?vakgebied .
+    ?vakgebiedProp a owl:AnnotationProperty .
+    ?vakgebiedProp skos:prefLabel "Vakgebied" .
+  }
+  # OPTIONAL {
+  #   ?specUri ?rfcURLProp ?rfcURL .
+  #   ?rfcURLProp a owl:AnnotationProperty .
+  #   ?rfcURLProp skos:prefLabel "RFC URL" .
+  # }
+  BIND (IF(BOUND(?aspectLabel),CONCAT(?specLabel," ",?aspectLabel),?specLabel) AS ?specPlusAspectLabel) .
+  BIND (STRBEFORE(?sourceDocument," ") AS ?docCodeSource) .
+  BIND (STRAFTER(?sourceDocument," ") AS ?docNameSource) .
+}
+ORDER BY ?conceptualSpecName ?specCode

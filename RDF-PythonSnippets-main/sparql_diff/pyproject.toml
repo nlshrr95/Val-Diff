@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "sparql_diff"
+version = "0.9.0"
+authors = [
+  { name="Coen van Gruijthuijsen", email="coenvangruijthuijsen@semmtech.com" },
+]
+description = "A small python package to manipulate RDF"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [ 
+  "requests", 
+  "rdflib",
+  "pandas",
+  "xlsxwriter",
+  "pyyaml",
+  "click",
+  "jinja2"
+  ]
+
+[project.scripts]
+sparql-diff = "diff_checker:start"

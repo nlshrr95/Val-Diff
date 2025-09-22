@@ -1,0 +1,27 @@
+queries:
+  Concepts:
+    file: "./Part1-Concepts.sparql"
+    columns:
+      - conceptUri
+  Relations:
+    file: "./Part2-Relations.sparql"
+    columns:
+      - relationUri
+  Attributes:
+    file: "./Part3-Attributes.sparql"
+    columns:
+      - attributeUri
+endpoints:
+  old: 
+    url: https://hub.laces.tech/tennet/gfo-nl/eu-303/eu-303-ontology/versions/v2_0/sparql
+    username: 9d8f4122-7435-464f-8be5-8ad1631dc5de
+    password: CgYucApC4CUEzkoHA9iP
+    default-graph-uri: []
+    named-graph-uri: []
+  new:
+    url: https://hub.laces.tech/tennet/gfo-nl/eu-303/eu-303-ontology/versions/v2_1/sparql
+    username: 9d8f4122-7435-464f-8be5-8ad1631dc5de
+    password: CgYucApC4CUEzkoHA9iP
+    default-graph-uri: []
+    named-graph-uri: []    
+output_path: Core ontology v2_0 to v2_1 changelog.xlsx

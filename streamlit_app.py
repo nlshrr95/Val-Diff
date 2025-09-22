@@ -7,18 +7,20 @@ import requests
 import pandas as pd
 import os
 import datetime
-from version_comparator import DeltaChecker
+from version_comparator import run_external_comparison
 
 # --- App Configuration ---
-st.set_page_config(page_title="Laces Ontology Explorer", layout="wide")
+st.set_page_config(page_title="Laces Data Utilities", layout="wide")
 
 # --- Global Data & Constants ---
 QUERY_DIR = "queries"
 # This dictionary defines the available queries the user can select.
+# It now includes an 'ignored_columns' key to match the new config structure.
 QUERY_OPTIONS = {
     "General": {
-        "file": os.path.join(QUERY_DIR, "objects.sparql"),
-        "columns": ["conceptUri"]
+        "file": os.path.abspath(os.path.join(QUERY_DIR, "algemeen_discipline.sparql")),
+        "columns": ["conceptUri"],
+        "ignored_columns": []
     }
 }
 
@@ -48,14 +50,14 @@ st.markdown("""
     <div class="custom-header">
         <div class="logo-section">
             <img src="https://market.laceshub.com/_next/static/media/logo.2f9a686f.svg" alt="LACES Logo">
-            <div class="logo-text">Ontology Explorer</div>
+            <div class="logo-text">Data Utilities</div>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
 
 # --- Main Application Tabs ---
-validator_tab, compare_tab = st.tabs(["Ontology Validator", "Changelog Generator"])
+validator_tab, compare_tab = st.tabs(["Ontology Validator", "Version Comparer (v2.0)"])
 
 # ==============================================================================
 # --- VALIDATOR TAB ---
@@ -128,25 +130,39 @@ with validator_tab:
                     st.error(f"An error occurred during validation: {e}")
 
 # ==============================================================================
-# --- VERSION COMPARER TAB ---
+# --- VERSION COMPARER TAB (v2.0) ---
 # ==============================================================================
 with compare_tab:
     st.markdown('<div class="section-title">Version Comparison</div>', unsafe_allow_html=True)
-    st.write("Provide the SPARQL endpoints for the two OTL versions you want to compare.")
+    st.write("Provide the SPARQL endpoints and any other relevant details for the two OTL versions you want to compare.")
+    st.info("This version uses the external `sparql-diff` command-line tool. Ensure the library is installed correctly.", icon="ℹ️")
 
-    st.markdown('<h3>1. Provide Endpoints & Select Queries</h3>', unsafe_allow_html=True)
+    st.markdown('<h3>1. Configure Endpoints & Select Queries</h3>', unsafe_allow_html=True)
     
     c1, c2 = st.columns(2)
     with c1:
-        old_endpoint_url = st.text_input("Old Version SPARQL Endpoint")
-    with c2:
-        new_endpoint_url = st.text_input("New Version SPARQL Endpoint")
+        st.subheader("Old Version")
+        old_endpoint_url = st.text_input("SPARQL Endpoint*", key="old_endpoint")
+        old_default_graph = st.text_input("Default Graph URI", key="old_default")
+        old_named_graph = st.text_input("Named Graph URI", key="old_named")
+        old_username = st.text_input("Username", key="old_user")
+        old_password = st.text_input("Password", type="password", key="old_pass")
 
+    with c2:
+        st.subheader("New Version")
+        new_endpoint_url = st.text_input("SPARQL Endpoint*", key="new_endpoint")
+        new_default_graph = st.text_input("Default Graph URI", key="new_default")
+        new_named_graph = st.text_input("Named Graph URI", key="new_named")
+        new_username = st.text_input("Username", key="new_user")
+        new_password = st.text_input("Password", type="password", key="new_pass")
+
+    st.subheader("Comparison Options")
     selected_queries = st.multiselect(
         "Select the aspects (queries) to compare:",
         options=list(QUERY_OPTIONS.keys()),
         default=list(QUERY_OPTIONS.keys())
     )
+    include_unchanged = st.checkbox("Include unchanged items in the report", value=False)
     
     st.markdown('<hr style="margin-top:2em; margin-bottom:2em;">', unsafe_allow_html=True)
     st.markdown('<h3>2. Run Comparison</h3>', unsafe_allow_html=True)
@@ -162,38 +178,60 @@ with compare_tab:
                 progress_bar.progress(fraction, text=text)
 
             try:
-                # Build a simplified config dictionary with only endpoint URLs
-                config = {
-                    "endpoints": {
-                        "old": {"url": old_endpoint_url},
-                        "new": {"url": new_endpoint_url}
-                    },
-                    "queries": {name: QUERY_OPTIONS[name] for name in selected_queries},
-                    "summary": {"query": os.path.join(QUERY_DIR, "summary.sparql")}
-                }
+                # --- Build Old Version Config ---
+                old_endpoint_config = {"url": old_endpoint_url}
+                if old_default_graph:
+                    old_endpoint_config["default_graph_uri"] = [old_default_graph]
+                if old_named_graph:
+                    old_endpoint_config["named_graph_uri"] = [old_named_graph]
+                if old_username:
+                    old_endpoint_config["username"] = old_username
+                if old_password:
+                    old_endpoint_config["password"] = old_password
+
+                # --- Build New Version Config ---
+                new_endpoint_config = {"url": new_endpoint_url}
+                if new_default_graph:
+                    new_endpoint_config["default_graph_uri"] = [new_default_graph]
+                if new_named_graph:
+                    new_endpoint_config["named_graph_uri"] = [new_named_graph]
+                if new_username:
+                    new_endpoint_config["username"] = new_username
+                if new_password:
+                    new_endpoint_config["password"] = new_password
                 
-                checker = DeltaChecker(config)
-                excel_data = checker.run(progress_callback=update_progress)
+                # --- Build Final Config Dict according to the new structure ---
+                config = {
+                    "queries": {name: QUERY_OPTIONS[name] for name in selected_queries},
+                    "include_unchanged": include_unchanged,
+                    "endpoints": {
+                        "old": old_endpoint_config,
+                        "new": new_endpoint_config
+                    }
+                }
+
+                # Call the runner function which handles the subprocess
+                excel_data = run_external_comparison(config, progress_callback=update_progress)
                 
                 if excel_data:
                     st.session_state['comparison_result'] = excel_data
-                    filename = f"changelog_{datetime.date.today()}.xlsx"
+                    filename = f"changelog_v2_{datetime.date.today()}.xlsx"
                     st.session_state['report_filename'] = filename
                     progress_bar.empty()
                     st.success("Comparison finished! Your report is ready for download below.")
                 else:
                     progress_bar.empty()
-                    st.error("Comparison finished, but no data was generated. Check endpoint responses.")
+                    st.error("Comparison finished, but no report file was generated.")
             
             except Exception as e:
                 progress_bar.empty()
-                st.error("An error occurred during comparison:")
-                st.code(str(e), language="")
+                st.error("An error occurred while running the external comparison tool:")
+                st.code(str(e), language="bash")
             
     # Display download button if a report has been generated
     if 'comparison_result' in st.session_state and st.session_state['comparison_result']:
         st.download_button(
-            label="Download Comparison Report",
+            label="⬇️ Download Comparison Report",
             data=st.session_state['comparison_result'],
             file_name=st.session_state.get('report_filename', 'comparison_report.xlsx'),
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

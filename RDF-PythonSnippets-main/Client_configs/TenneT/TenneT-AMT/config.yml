@@ -1,0 +1,269 @@
+queries:
+  Conceptuals:
+    file: "./TennetAMTeisen1.sparql"
+    columns:
+      - specUri
+  Objects:
+    file: "./TennetAMTeisen2.sparql"
+    columns:
+      - specUri
+      - specCode
+      - object
+  AMStatements:
+    file: "./TennetAMTeisen3.sparql"
+    columns:
+      - specUri
+  Verifications:
+    file: "./TennetAMTeisen4.sparql"
+    columns:
+      - specUri
+      - specCode 
+      - verificationPlan
+  ConfiguratorsRelations:
+    file: "./TennetAMTeisen5.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  AsymmetrischePiekstroom:
+    file: "./TennetAMTeisen5.1.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  Beveiligingsfunctie:
+    file: "./TennetAMTeisen5.2.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  BRPofConventioneel:
+    file: "./TennetAMTeisen5.3.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  SecurityCategory:
+    file: "./TennetAMTeisen5.5.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  ConductorClampType:
+    file: "./TennetAMTeisen5.6.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  ConserveringType:
+    file: "./TennetAMTeisen5.7.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  Geleidertype:
+    file: "./TennetAMTeisen5.8.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  Country:
+    file: "./TennetAMTeisen5.9.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  Hoofd-beveiligingsprincipe:
+    file: "./TennetAMTeisen5.12.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  InsulationType:
+    file: "./TennetAMTeisen5.13.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  IsolatorType:
+    file: "./TennetAMTeisen5.14.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  KastAlsDeelVanSysteem:
+    file: "./TennetAMTeisen5.15.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  KastBehuizingstype:
+    file: "./TennetAMTeisen5.16.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  KastKlimatisering:
+    file: "./TennetAMTeisen5.17.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  KastOpstelling:
+    file: "./TennetAMTeisen5.18.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  KastregisterNaamgeving:
+    file: "./TennetAMTeisen5.19.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  KastZwenkraamToepassing:
+    file: "./TennetAMTeisen5.31.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  # LocatieDerden:
+  #   file: "./TennetAMTeisen5.20.sparql"
+  #   columns:
+  #     - specUri
+  #     - specCode
+  #     - groupName
+  #     - value
+  NoodstroomaggregaatOpstelling:
+    file: "./TennetAMTeisen5.4.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  OpdrachtgeverGeleverdeGoederen:
+    file: "./TennetAMTeisen5.10.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  ProjectWerksituatie:
+    file: "./TennetAMTeisen5.11.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  StandaardDocumenten:
+    file: "./TennetAMTeisen5.21.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  SymmetrischeKortsluitstroom:
+    file: "./TennetAMTeisen5.22.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  TijdelijkeOmbouwOplossing:
+    file: "./TennetAMTeisen5.23.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  MastType:
+    file: "./TennetAMTeisen5.24.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  TransformatorOpstelling:
+    file: "./TennetAMTeisen5.25.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  VeldaansluitingTechniek:
+    file: "./TennetAMTeisen5.26.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  VeldaansluitingVoor:
+    file: "./TennetAMTeisen5.27.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  VeldverbindingNaar:
+    file: "./TennetAMTeisen5.28.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  Voedingspunt:
+    file: "./TennetAMTeisen5.29.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  VoltageLevel:
+    file: "./TennetAMTeisen5.30.sparql"
+    columns:
+      - specUri
+      - specCode
+      - groupName
+      - value
+  ReferredStandard:
+   file: "./TenneTAMTeisen6.0.sparql"
+   columns:
+     - referredStandardUri
+  ReferredStandardRel:
+   file: "./TenneTAMTeisen6.1.sparql"
+   columns:
+     - specUri
+     - specCode
+     - referredStandardUri
+endpoints:
+  old: 
+    url: https://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-vs1/versions/v10_0/sparql?default-graph-uri=http://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-atl/versions/v7_0&default-graph-uri=http://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-otl/versions/v10_0
+    username: 9d8f4122-7435-464f-8be5-8ad1631dc5de
+    password: CgYucApC4CUEzkoHA9iP
+    default-graph-uri: []
+    named-graph-uri: []
+  new:
+    url: https://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-vs1/versions/v11_0/sparql?default-graph-uri=http://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-atl/versions/v7_1&default-graph-uri=http://hub.laces.tech/tennet/gfo-nl/eu-303/private/live/tennet/library/eu-303-otl/versions/v11_0
+    username: 9d8f4122-7435-464f-8be5-8ad1631dc5de
+    password: CgYucApC4CUEzkoHA9iP
+    default-graph-uri: []
+    named-graph-uri: []    
+output_path: output.xlsx

@@ -1,0 +1,81 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX base:  <https://w3id.org/def/basicsemantics-owl#>
+PREFIX tennet: <http://data.tennet.eu/def/>
+PREFIX nen2660: <https://w3id.org/nen2660/def#>
+
+
+
+SELECT 
+       ?activityName 
+       ?activityUri 
+       ?decompositionParentUri
+       ?decompositionParentName
+
+WHERE {
+
+      VALUES (?topConcept ?type) {
+      (base:Activity "Activity")
+      (nen2660:Activity   "Activity")
+  }
+    ?activityUri rdfs:subClassOf+ ?topConcept .
+    FILTER( ?activityUri != tennet:Function && ?activityUri != tennet:Verification) .
+    ?activityUri skos:prefLabel ?activityName .
+    #?activityUri rdfs:subClassOf/skos:prefLabel ?taxonomyParent .
+
+    OPTIONAL{
+        ?decompositionParentUri skos:prefLabel ?decompositionParentName .
+        ?decompositionParentUri rdfs:subClassOf ?restriction .
+    #Trying to capture both nta and nen schema for the hasPart relation.
+        VALUES ?partProperty {
+        base:hasPart
+        nen2660:hasPart
+        }
+        ?restriction owl:onProperty ?partProperty .
+        ?restriction owl:onClass ?activityUri .
+    }
+    # OPTIONAL {
+    #     #Change to skos:related for documents of DCC
+    #     ?document skos:prefLabel ?describedByDocument .
+    #     ?document rdfs:subClassOf ?restriction2 .
+    #     ?restriction2 owl:onProperty nen2660:isDescribedBy .
+    #     ?restriction2 owl:onClass ?activityUri .
+    # }
+    OPTIONAL {
+        #Change to skos:related for documents of DCC
+        ?activityUri skos:related ?document .
+        ?document skos:prefLabel ?describedByDocument .
+    }
+    OPTIONAL {
+        ?activityUri ?isoCodeProp ?isoCode .
+        ?isoCodeProp a owl:AnnotationProperty .
+        ?isoCodeProp skos:prefLabel "ISO15288 code" .
+    }
+    OPTIONAL {
+        ?activityUri ?ogProp ?OG .
+        ?ogProp a owl:AnnotationProperty .
+        ?ogProp skos:prefLabel "OG" .
+    }
+    OPTIONAL {
+        ?activityUri ?onProp ?ON .
+        ?onProp a owl:AnnotationProperty .
+        ?onProp skos:prefLabel "ON" .
+    }
+    OPTIONAL {
+        ?activityUri ?internationalDescriptionProp ?internationalDescription .
+        ?internationalDescriptionProp a owl:AnnotationProperty .
+        ?internationalDescriptionProp skos:prefLabel "2 Description in international standard" .
+    }
+    OPTIONAL {
+        ?activityUri ?tennetDescriptionProp ?tennetDescription .
+        ?tennetDescriptionProp a owl:AnnotationProperty .
+        ?tennetDescriptionProp skos:prefLabel "6 Description EU-303" .
+    }
+    BIND(COALESCE(STR(?internationalDescription),STR(?tennetDescription)) AS ?activityDescription) .
+    }
+    ORDER BY ?activityName ?taxonomyParent ?decompositionParent
