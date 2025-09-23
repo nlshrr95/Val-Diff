@@ -6,28 +6,21 @@ import logging
 from io import BytesIO
 
 def run_external_comparison(config_dict, progress_callback=None):
-    """
-    Generates a config.yml file in a temporary directory, runs the 
-    external 'sparql-diff' command against it, and returns the resulting 
-    Excel file as a BytesIO object for in-memory handling.
-    """
-    # Use a temporary directory to avoid cluttering the project folder.
-    # The directory and its contents are automatically deleted upon exit.
+    # Use a temporary directory to avoid cluttering the project folder. Directory and its contents are automatically deleted upon exit.
     with tempfile.TemporaryDirectory() as temp_dir:
         config_filename = 'config.yml'
         config_path = os.path.join(temp_dir, config_filename)
         output_filename = 'changelog_output.xlsx'
         output_path = os.path.join(temp_dir, output_filename)
 
-        # The external tool needs the output_path inside the config file.
+        # SParql diff expects an output_path in the config file.
         config_dict['output_path'] = output_path
         
         # Write the dynamically generated config to the temp file
         with open(config_path, 'w') as f:
             yaml.dump(config_dict, f, default_flow_style=False)
 
-        # Define the command to be executed.
-        # 'sparql-diff' is the entry point defined in the library's setup.
+        # Execute the command. Here I assume 'sparql-diff' is available in the system PATH.
         command = ['sparql-diff']
 
         try:
@@ -52,7 +45,7 @@ def run_external_comparison(config_dict, progress_callback=None):
             if progress_callback:
                 progress_callback(0.9, "Reading generated report...")
 
-            # After the tool runs, read the generated Excel file into memory
+            # Load into memory for download button
             if os.path.exists(output_path):
                 with open(output_path, 'rb') as f:
                     excel_data = BytesIO(f.read())

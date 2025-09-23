@@ -7,7 +7,6 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 SELECT ?NaamOTL ?version ?versionIRI ?createdOn
-FROM ?DEFAULT_URI
 WHERE {
 ?OTL_IRI a owl:Ontology . 
 OPTIONAL{?OTL_IRI   rdfs:comment ?NaamOTL .		} 
