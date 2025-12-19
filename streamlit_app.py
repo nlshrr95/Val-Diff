@@ -8,6 +8,7 @@ import pandas as pd
 import os
 import datetime
 from version_comparator import DeltaChecker
+from laces_engine import LacesEngine, LacesPDF
 
 # --- App Configuration ---
 st.set_page_config(page_title="Laces Ontology Explorer", layout="wide")
@@ -55,7 +56,7 @@ st.markdown("""
 
 
 # --- Main Application Tabs ---
-validator_tab, compare_tab = st.tabs(["Ontology Validator", "Changelog Generator"])
+validator_tab, compare_tab, docgen_tab = st.tabs(["Ontology Validator", "Changelog Generator", "Document Generator"])
 
 # ==============================================================================
 # --- VALIDATOR TAB ---
@@ -199,3 +200,76 @@ with compare_tab:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
+# ==============================================================================
+# --- Docgen TAB ---
+# ==============================================================================
+
+if "md_report" not in st.session_state:
+    st.session_state.md_report = ""
+
+with docgen_tab:
+    # --- EXPORT ACTIONS ---
+    if st.session_state.md_report:
+        st.subheader("Export Options")
+        exp_c1, exp_c2, _ = st.columns([1, 1, 2])
+        try:
+            pdf = LacesPDF()
+            pdf.add_page()
+            pdf.add_markdown(st.session_state.md_report)
+            pdf_out = pdf.output(dest='S').encode('latin-1', 'replace')
+            exp_c1.download_button("Download PDF", pdf_out, "report.pdf", "application/pdf", use_container_width=True)
+        except Exception as e:
+            exp_c1.error(f"PDF Build Error: {e}")
+        exp_c2.download_button("Download Markdown", st.session_state.md_report, "report.md", "text/markdown", use_container_width=True)
+        st.divider()
+
+    # --- SETTINGS SECTION ---
+    st.subheader("Publication configuration")
+    
+
+    with st.expander("Configure Connection and Queries", expanded=True):
+        sc1, sc2, sc3 = st.columns([2, 1, 1])
+        endpoint = sc1.text_input("SPARQL Endpoint", value="https://hub.laces.tech/groups/repo/sparql")
+        user = sc2.text_input("Username")
+        pwd = sc3.text_input("Password", type="password")
+        q_specs = st.text_area("Specifications Query", height=100, value="""PREFIX cm: <http://models.laces.tech/contractmanager/def/>\nPREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX sem:  <http://data.semmtech.com/sem/def/>\nSELECT DISTINCT ?uri ?name ?text\nWHERE {\n    ?uri a cm:IndividualSpecification ;\n        sem:name ?name ;\n        cm:isDescribedIn ?t .\n    ?t sem:value ?text .\n} ORDER BY ?name""")
+        q_subs = st.text_area("Subjects Query", height=100, value="""PREFIX cm: <http://models.laces.tech/contractmanager/def/>\nPREFIX sem:  <http://data.semmtech.com/sem/def/>\nSELECT DISTINCT ?uri ?name ?type\nWHERE {\n    ?role sem:roleFor <{spec_uri}> .\n    ?uri cm:shallBeCompliantWith ?role ;\n        sem:classifiedAs ?classifier ;\n        sem:name ?name .\n    ?classifier sem:name ?type .\n} ORDER BY ?name""")
+        q_plans = st.text_area("Plans Query", height=100, value="""PREFIX cm: <http://models.laces.tech/contractmanager/def/>\nPREFIX sem:  <http://data.semmtech.com/sem/def/>\nSELECT DISTINCT ?plan ?method ?phase\nWHERE {\n    ?role sem:roleFor <{spec_uri}> ;\n        cm:isVerifiedBy ?p .\n    ?p cm:isASpecializationOf ?m ;\n        sem:name ?plan ;\n        cm:occursWithin ?ph .\n    ?ph sem:name ?phase .\n    ?m sem:name ?method .\n}""")
+        gen_btn = st.button("Generate Document", use_container_width=True)
+
+    # --- GENERATION LOGIC ---
+    if gen_btn:
+        # Template queries remain consistent with frozen logic
+        q_sub_template = """PREFIX cm: <http://models.laces.tech/contractmanager/def/>\nPREFIX sem:  <http://data.semmtech.com/sem/def/>\nSELECT DISTINCT ?uri ?name ?type\nWHERE {\n    ?role sem:roleFor <{spec_uri}> .\n    ?uri cm:shallBeCompliantWith ?role ;\n        sem:classifiedAs ?classifier ;\n        sem:name ?name .\n    ?classifier sem:name ?type .\n} ORDER BY ?name"""
+        q_plan_template = """PREFIX cm: <http://models.laces.tech/contractmanager/def/>\nPREFIX sem:  <http://data.semmtech.com/sem/def/>\nSELECT DISTINCT ?plan ?method ?phase\nWHERE {\n    ?role sem:roleFor <{spec_uri}> ;\n        cm:isVerifiedBy ?p .\n    ?p cm:isASpecializationOf ?m ;\n        sem:name ?plan ;\n        cm:occursWithin ?ph .\n    ?ph sem:name ?phase .\n    ?m sem:name ?method .\n}"""
+
+        with st.spinner("Generating Report..."):
+            specs = LacesEngine.retrieve_objects(endpoint, user, pwd, q_specs, ("uri", "name", "text"))
+            if specs:
+                md = "# Requirements Report\n\n"
+                for spec in specs:
+                    subs = LacesEngine.retrieve_objects(endpoint, user, pwd, q_sub_template.replace("{spec_uri}", spec['uri']), ("uri", "name", "type"))
+                    plans = LacesEngine.retrieve_objects(endpoint, user, pwd, q_plan_template.replace("{spec_uri}", spec['uri']), ("plan", "method", "phase"))
+                    md += f"## {spec['name'].capitalize()}\n**Specification:** {spec['text']}\n\n"
+                    if subs:
+                        md += "| **Subject Name** | **Type** |\n|:---|:---|\n"
+                        for s in subs: md += f"| {s['name']} | {s['type']} |\n"
+                        md += "\n"
+                    if plans:
+                        md += "| **Phase** | **Method** | **Plan** |\n|:---|:---|:---|\n"
+                        for p in plans: md += f"| {p['phase']} | {p['method']} | {p['plan']} |\n"
+                        md += "\n"
+                    md += "---\n\n"
+                st.session_state.md_report = md
+                st.rerun()
+
+    # --- EDITOR & PREVIEW ---
+    if st.session_state.md_report:
+        st.divider()
+        ed_col, pre_col = st.columns(2)
+        with ed_col:
+            st.subheader("Markdown Editor")
+            st.session_state.md_report = st.text_area("Editor", value=st.session_state.md_report, height=600, label_visibility="collapsed")
+        with pre_col:
+            st.subheader("Rendered Preview")
+            st.markdown(st.session_state.md_report)

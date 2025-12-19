@@ -7,3 +7,5 @@ pydeck
 pyyaml
 xlsxwriter
 openpyxl
+fpdf
+SPARQLWrapper
