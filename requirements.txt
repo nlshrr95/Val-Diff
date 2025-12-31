@@ -9,3 +9,5 @@ xlsxwriter
 openpyxl
 fpdf
 SPARQLWrapper
+mixpanel
+uuid
