@@ -9,35 +9,7 @@ import os
 import datetime
 from version_comparator import DeltaChecker
 from laces_engine import LacesEngine, LacesPDF
-from mixpanel import Mixpanel
 import uuid
-
-# --- Mixpanel Analytics Setup ---
-# 1. Initialize Mixpanel Client
-if "mixpanel" not in st.session_state:
-    st.session_state.mixpanel = Mixpanel(st.secrets["MIXPANEL_TOKEN"])
-
-# 2. Ensure a persistent user ID for the session
-if "user_id" not in st.session_state:
-    st.session_state.user_id = str(uuid.uuid4())
-
-def track_event(event_name, properties=None):
-    """Helper function to track events with session context"""
-    props = {
-        "page": st.session_state.get("current_page", "main"),
-        "stream_version": "1.0.0"
-    }
-    if properties:
-        props.update(properties)
-        
-    st.session_state.mixpanel.track(
-        st.session_state.user_id, 
-        event_name, 
-        props
-    )
-
-st.session_state.current_page = "Main Page"
-track_event("Main Page View")
 
 # --- App Configuration ---
 st.set_page_config(page_title="Laces Ontology Explorer", layout="wide")
